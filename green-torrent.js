@@ -2,19 +2,45 @@
 (function () {
   'use strict';
 
-  function greenTorrent() {
-    document.querySelectorAll(
-      '.button--torrent, .torrent'
-    ).forEach(function (el) {
-      el.style.color = '#00e676';
+  const green = '#00e676';
+
+  function update() {
+    document.querySelectorAll('body *').forEach(el => {
+      if (el.children.length > 3) return;
+
+      const label = (el.textContent || '').trim();
+
+      if (label !== 'Торренты') return;
+
+      const button = el.closest(
+        '.selector, .full-start__button, .button'
+      ) || el;
+
+      button.style.setProperty(
+        'color', green, 'important'
+      );
+      button.style.setProperty(
+        'border-color', green, 'important'
+      );
     });
   }
 
-  greenTorrent();
+  let pending = false;
 
-  new MutationObserver(greenTorrent).observe(
+  function schedule() {
+    if (pending) return;
+    pending = true;
+
+    requestAnimationFrame(() => {
+      pending = false;
+      update();
+    });
+  }
+
+  update();
+
+  new MutationObserver(schedule).observe(
     document.body,
     { childList: true, subtree: true }
   );
 })();
-
